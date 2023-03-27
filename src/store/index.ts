@@ -3,6 +3,7 @@ import { configureStore } from "@reduxjs/toolkit";
 // Configure the store with redux-toolkit by adding all the slices
 export const store = configureStore({
   reducer: {},
+  devTools: process.env.NODE_ENV !== "production",
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
