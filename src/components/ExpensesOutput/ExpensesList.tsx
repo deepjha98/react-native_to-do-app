@@ -1,13 +1,13 @@
 import { FlatList, Text } from "react-native";
 
 import { ExpensesData } from "@src/ts/interface";
-import React from "react";
+import ExpenseItem from "./ExpenseItem";
 
 type Props = { expenses: ExpensesData[] };
 
 const ExpensesList = ({ expenses }: Props) => {
   const renderExpenseItem = ({ item }: { item: ExpensesData }) => (
-    <Text>{item.description}</Text>
+    <ExpenseItem {...item} />
   );
 
   return (
