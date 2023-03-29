@@ -5,76 +5,19 @@ import { ExpensesData } from "@src/ts/interface";
 import ExpensesList from "./ExpensesList";
 import ExpensesSummary from "./ExpensesSummary";
 
-type Props = { expenses: ExpensesData[]; expensesPeriod: string };
+type Props = {
+  expenses: ExpensesData[];
+  expensesPeriod: string;
+  fallBackText: string;
+};
 
-const DUMMY_EXPENSES = [
-  {
-    id: "e1",
-    description: "A pair of shoes",
-    amount: 699,
-    date: new Date("2022-12-14"),
-  },
-  {
-    id: "e2",
-    description: "Bought a jeans",
-    amount: 599.5,
-    date: new Date("2023-02-14"),
-  },
-  {
-    id: "e3",
-    description: "Went for lunch",
-    amount: 123.99,
-    date: new Date("2022-12-04"),
-  },
-  {
-    id: "e4",
-    description: "Netflix bill",
-    amount: 59.19,
-    date: new Date("2023-01-01"),
-  },
-  {
-    id: "e5",
-    description: "Bought a book",
-    amount: 19,
-    date: new Date("2023-03-27"),
-  },
-  {
-    id: "e1",
-    description: "A pair of shoes",
-    amount: 699,
-    date: new Date("2022-12-14"),
-  },
-  {
-    id: "e2",
-    description: "Bought a jeans",
-    amount: 599.5,
-    date: new Date("2023-02-14"),
-  },
-  {
-    id: "e3",
-    description: "Went for lunch",
-    amount: 123.99,
-    date: new Date("2022-12-04"),
-  },
-  {
-    id: "e4",
-    description: "Netflix bill",
-    amount: 59.19,
-    date: new Date("2023-01-01"),
-  },
-  {
-    id: "e5",
-    description: "Bought a book",
-    amount: 19,
-    date: new Date("2023-03-27"),
-  },
-];
-
-const ExpensesOutput = ({ expenses, expensesPeriod }: Props) => {
+const ExpensesOutput = ({ expenses, expensesPeriod, fallBackText }: Props) => {
+  const Content = <Text style={styles.infoText}>{fallBackText}</Text>;
   return (
     <View style={styles.container}>
-      <ExpensesSummary expenses={DUMMY_EXPENSES} timePeriod={expensesPeriod} />
-      <ExpensesList expenses={DUMMY_EXPENSES} />
+      <ExpensesSummary expenses={expenses} timePeriod={expensesPeriod} />
+
+      {expenses.length > 0 ? <ExpensesList expenses={expenses} /> : Content}
     </View>
   );
 };
@@ -86,5 +29,11 @@ const styles = StyleSheet.create({
     padding: 24,
     backgroundColor: GlobalStyles.colors.primary700,
     flex: 1,
+  },
+  infoText: {
+    color: "white",
+    fontSize: 16,
+    textAlign: "center",
+    marginTop: 32,
   },
 });

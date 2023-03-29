@@ -7,7 +7,8 @@ import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import RecentExpenses from "@src/screens/RecentExpenses";
 import AllExpenses from "@src/screens/AllExpenses";
 import { GlobalStyles } from "@src/constants/styles";
-import React from "react";
+import IconButton from "@src/components/UI/IconButton";
+import { Screens } from "@src/constants/enums";
 
 const BottomTabs = createBottomTabNavigator();
 
@@ -16,7 +17,7 @@ type Props = {};
 const BottomNavigation = (props: NativeStackScreenProps<any>) => {
   return (
     <BottomTabs.Navigator
-      screenOptions={{
+      screenOptions={({ navigation }) => ({
         headerStyle: {
           backgroundColor: GlobalStyles.colors.primary500,
         },
@@ -25,11 +26,20 @@ const BottomNavigation = (props: NativeStackScreenProps<any>) => {
           backgroundColor: GlobalStyles.colors.primary500,
         },
         tabBarActiveTintColor: GlobalStyles.colors.accent500,
-        headerRight: () => {},
-      }}
+        headerRight: ({ tintColor }) => (
+          <IconButton
+            icon="add"
+            size={24}
+            color={tintColor}
+            onPress={() => {
+              navigation.navigate(Screens.MANAGE_EXPENSES);
+            }}
+          />
+        ),
+      })}
     >
       <BottomTabs.Screen
-        name="RecentExpenses"
+        name={Screens.RECENT_EXPENSES}
         component={RecentExpenses}
         options={{
           title: "Recent Expenses",
@@ -40,7 +50,7 @@ const BottomNavigation = (props: NativeStackScreenProps<any>) => {
         }}
       />
       <BottomTabs.Screen
-        name="AllExpenses"
+        name={Screens.ALL_EXPENSES}
         component={AllExpenses}
         options={{
           title: "All Expenses",
