@@ -38,6 +38,7 @@ const ExpenseForm = ({
   });
 
   // handle confirm
+
   const handleConfirm = () => {
     const expenseData = {
       amount: +form.amount.value,

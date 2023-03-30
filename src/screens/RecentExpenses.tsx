@@ -1,15 +1,17 @@
-import { useContext, useEffect } from "react";
+import { useContext, useEffect, useState } from "react";
 
 import { StyleSheet } from "react-native";
 
 import ExpensesOutput from "@src/components/ExpensesOutput";
 import { AppContext } from "@src/store/context";
 import { fetchExpense } from "@src/util/http";
-import { ExpensesData } from "@src/ts/interface";
+import LoadingOverlay from "@src/components/UI/LoadingOverlay";
 
 type Props = {};
 
 const RecentExpenses = (props: Props) => {
+  const [isFetching, setIsFetching] = useState<Boolean>(false);
+
   const {
     state: { expenses },
     dispatch,
@@ -17,18 +19,26 @@ const RecentExpenses = (props: Props) => {
 
   useEffect(() => {
     async function getExpenses() {
+      setIsFetching(true);
       const expenses = await fetchExpense();
       dispatch({ type: "SYNC_EXPENSE", payload: expenses });
+      setIsFetching(false);
     }
     getExpenses();
   }, []);
 
   return (
-    <ExpensesOutput
-      fallBackText="No expense registered for last 7 Days"
-      expenses={expenses}
-      expensesPeriod="Last 7 Days"
-    />
+    <>
+      {isFetching ? (
+        <LoadingOverlay />
+      ) : (
+        <ExpensesOutput
+          fallBackText="No expense registered for last 7 Days"
+          expenses={expenses}
+          expensesPeriod="Last 7 Days"
+        />
+      )}
+    </>
   );
 };
 

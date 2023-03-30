@@ -1,4 +1,4 @@
-import { useEffect, useContext } from "react";
+import { useEffect, useContext, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
@@ -7,6 +7,7 @@ import { GlobalStyles } from "@src/constants/styles";
 import { AppContext } from "@src/store/context";
 import { deleteExpense, storeExpense, updateExpense } from "@src/util/http";
 import ExpenseForm from "@src/components/ManageExpense/ExpenseForm";
+import LoadingOverlay from "@src/components/UI/LoadingOverlay";
 
 type RootStackParamList = {
   Profile: { expenseId: string | undefined };
@@ -20,6 +21,8 @@ const ManageExpenses = ({ navigation, route }: Props) => {
     state: { expenses },
     dispatch,
   } = useContext(AppContext);
+
+  const [isLoading, setIsLoading] = useState<Boolean>(false);
 
   const editedExpenseId = route.params?.expenseId;
   const isEditing = !!editedExpenseId;
@@ -64,8 +67,9 @@ const ManageExpenses = ({ navigation, route }: Props) => {
     amount: number;
     date: Date;
   }) => {
+    setIsLoading(true);
     if (isEditing) {
-      updateExpense(editedExpenseId, formData)
+      await updateExpense(editedExpenseId, formData)
         .then(() => {
           dispatch({
             type: "EDIT_EXPENSE",
@@ -80,7 +84,7 @@ const ManageExpenses = ({ navigation, route }: Props) => {
           console.error({ error });
         });
     } else {
-      storeExpense(formData)
+      await storeExpense(formData)
         .then(({ data }) => {
           dispatch({
             type: isEditing ? "EDIT_EXPENSE" : "ADD_EXPENSE",
@@ -92,26 +96,33 @@ const ManageExpenses = ({ navigation, route }: Props) => {
           console.error({ error });
         });
     }
+    setIsLoading(false);
   };
 
   return (
     <View style={styles.container}>
-      <ExpenseForm
-        onCancel={handleCancel}
-        onSubmit={handleConfirm}
-        submitButtonLabel={isEditing ? "Update" : "Add"}
-        initialValues={selectedExpense}
-      />
-
-      {isEditing && (
-        <View style={styles.deleteContainer}>
-          <IconButton
-            icon="trash"
-            color={GlobalStyles.colors.error500}
-            size={24}
-            onPress={handleDelete}
+      {isLoading ? (
+        <LoadingOverlay />
+      ) : (
+        <>
+          <ExpenseForm
+            onCancel={handleCancel}
+            onSubmit={handleConfirm}
+            submitButtonLabel={isEditing ? "Update" : "Add"}
+            initialValues={selectedExpense}
           />
-        </View>
+
+          {isEditing && (
+            <View style={styles.deleteContainer}>
+              <IconButton
+                icon="trash"
+                color={GlobalStyles.colors.error500}
+                size={24}
+                onPress={handleDelete}
+              />
+            </View>
+          )}
+        </>
       )}
     </View>
   );
