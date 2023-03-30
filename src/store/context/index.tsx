@@ -7,37 +7,18 @@ type InitialStateType = {
   expenses: ExpensesData[];
 };
 const initialState = {
-  expenses: [
-    {
-      id: "e1",
-      description: "A pair of shoes",
-      amount: 699,
-      date: new Date("2022-12-14"),
-    },
-    {
-      id: "e2",
-      description: "Bought a jeans",
-      amount: 599.5,
-      date: new Date("2023-02-14"),
-    },
-    {
-      id: "e3",
-      description: "Went for lunch",
-      amount: 123.99,
-      date: new Date("2022-12-04"),
-    },
-    {
-      id: "e4",
-      description: "Netflix bill",
-      amount: 59.19,
-      date: new Date("2023-01-01"),
-    },
-  ],
+  expenses: [],
 };
 
 // Reducer
 const expenseReducer = (state: any, action: any) => {
   switch (action.type) {
+    case "SYNC_EXPENSE":
+      return {
+        ...state,
+        expenses: [...action.payload].reverse(),
+      };
+
     case "ADD_EXPENSE":
       return {
         ...state,

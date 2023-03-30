@@ -4,8 +4,8 @@ import type { NativeStackScreenProps } from "@react-navigation/native-stack";
 
 import IconButton from "@src/components/UI/IconButton";
 import { GlobalStyles } from "@src/constants/styles";
-
 import { AppContext } from "@src/store/context";
+import { deleteExpense, storeExpense, updateExpense } from "@src/util/http";
 import ExpenseForm from "@src/components/ManageExpense/ExpenseForm";
 
 type RootStackParamList = {
@@ -36,13 +36,21 @@ const ManageExpenses = ({ navigation, route }: Props) => {
 
   // Used to delete an expense
   const handleDelete = () => {
-    dispatch({
-      type: "REMOVE_EXPENSE",
-      payload: {
-        id: editedExpenseId,
-      },
-    });
-    navigation.goBack();
+    deleteExpense(editedExpenseId!)
+      .then((response) => {
+        console.log({ response });
+        dispatch({
+          type: "REMOVE_EXPENSE",
+          payload: {
+            id: editedExpenseId,
+          },
+        });
+
+        navigation.goBack();
+      })
+      .catch((error) => {
+        console.error({ error });
+      });
   };
 
   // Handle cancel
@@ -51,27 +59,39 @@ const ManageExpenses = ({ navigation, route }: Props) => {
   };
 
   // handle confirm
-  const handleConfirm = (formData: {
+  const handleConfirm = async (formData: {
     description: string;
     amount: number;
-    data: Date;
+    date: Date;
   }) => {
     if (isEditing) {
-      dispatch({
-        type: "EDIT_EXPENSE",
-        payload: {
-          id: editedExpenseId,
-          ...formData,
-        },
-      });
+      updateExpense(editedExpenseId, formData)
+        .then(() => {
+          dispatch({
+            type: "EDIT_EXPENSE",
+            payload: {
+              id: editedExpenseId,
+              ...formData,
+            },
+          });
+          navigation.goBack();
+        })
+        .catch((error) => {
+          console.error({ error });
+        });
     } else {
-      dispatch({
-        type: isEditing ? "EDIT_EXPENSE" : "ADD_EXPENSE",
-        payload: formData,
-      });
+      storeExpense(formData)
+        .then(({ data }) => {
+          dispatch({
+            type: isEditing ? "EDIT_EXPENSE" : "ADD_EXPENSE",
+            payload: { id: data.name, ...formData },
+          });
+          navigation.goBack();
+        })
+        .catch((error) => {
+          console.error({ error });
+        });
     }
-
-    navigation.goBack();
   };
 
   return (

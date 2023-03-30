@@ -9,12 +9,13 @@ import React, { useState, useContext } from "react";
 
 import Button from "@src/components/UI/Button";
 import Input from "./Input";
+import { GlobalStyles } from "@src/constants/styles";
 
 type Props = {
   submitButtonLabel: string;
   onCancel: (event: GestureResponderEvent) => void;
   onSubmit: Function;
-  initialValues: { amount: string; date: Date; description: string };
+  initialValues?: { amount: string | number; date: Date; description: string };
 };
 
 const ExpenseForm = ({
@@ -52,15 +53,15 @@ const ExpenseForm = ({
         return {
           amount: {
             value: prevState.amount.value,
-            isValid: true,
+            isValid: amountIsValid,
           },
           date: {
             value: prevState.date.value,
-            isValid: true,
+            isValid: dateIsValid,
           },
           description: {
             value: prevState.description.value,
-            isValid: true,
+            isValid: hasDescription,
           },
         };
       });
@@ -75,6 +76,9 @@ const ExpenseForm = ({
     });
   };
 
+  const formIsInvalid =
+    !form.amount.isValid || !form.date.isValid || !form.description.isValid;
+
   return (
     <View style={styles.container}>
       <Text style={styles.formTitle}>Your Expense</Text>
@@ -82,6 +86,7 @@ const ExpenseForm = ({
         <Input
           label="Amount"
           style={styles.rowInput}
+          invalid={!form.amount.isValid}
           textInputConfig={{
             keyboardType: "decimal-pad",
             // @ts-ignore
@@ -92,6 +97,7 @@ const ExpenseForm = ({
         <Input
           label="Date"
           style={styles.rowInput}
+          invalid={!form.date.isValid}
           textInputConfig={{
             placeholder: "YYYY-MM-DD",
             maxLength: 10,
@@ -102,12 +108,15 @@ const ExpenseForm = ({
       </View>
       <Input
         label="Description"
+        invalid={!form.description.isValid}
         textInputConfig={{
           multiline: true,
           onChangeText: handleFormChange.bind(this, "description"),
           value: form.description.value,
         }}
       />
+
+      {formIsInvalid && <Text style={styles.errorText}>Input is invalid</Text>}
       <View style={styles.buttonGroup}>
         <Button style={styles.button} mode="flat" onPress={onCancel}>
           Cancel
@@ -144,5 +153,9 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     color: "white",
     marginVertical: 18,
+  },
+  errorText: {
+    color: GlobalStyles.colors.error500,
+    marginLeft: 4,
   },
 });
