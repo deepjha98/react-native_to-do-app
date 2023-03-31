@@ -38,8 +38,9 @@ const ManageExpenses = ({ navigation, route }: Props) => {
   }, [navigation, isEditing]);
 
   // Used to delete an expense
-  const handleDelete = () => {
-    deleteExpense(editedExpenseId!)
+  const handleDelete = async () => {
+    setIsLoading(true);
+    await deleteExpense(editedExpenseId!)
       .then((response) => {
         console.log({ response });
         dispatch({
@@ -54,6 +55,7 @@ const ManageExpenses = ({ navigation, route }: Props) => {
       .catch((error) => {
         console.error({ error });
       });
+    setIsLoading(false);
   };
 
   // Handle cancel
@@ -100,11 +102,11 @@ const ManageExpenses = ({ navigation, route }: Props) => {
   };
 
   return (
-    <View style={styles.container}>
+    <>
       {isLoading ? (
         <LoadingOverlay />
       ) : (
-        <>
+        <View style={styles.container}>
           <ExpenseForm
             onCancel={handleCancel}
             onSubmit={handleConfirm}
@@ -122,9 +124,9 @@ const ManageExpenses = ({ navigation, route }: Props) => {
               />
             </View>
           )}
-        </>
+        </View>
       )}
-    </View>
+    </>
   );
 };
 
